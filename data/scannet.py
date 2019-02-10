@@ -16,10 +16,14 @@ class ScanNet(data.Dataset):
 	in the target and transforms it. Default: None.
 	- loader (``callable``, optional): A function to load an image given its path.
 	By default, ``default_loader`` is used.
+	- color_mean
+	- color_std
+	- load_depth (``bool``): Whether or not to load depth images (architectures that use depth 
+	information need depth to be loaded)
 	"""
 
 	def __init__(self, root_dir, scene_file, mode='train', transform=None, label_transform = None, \
-		loader=utils.scannet_loader, color_mean=[0.,0.,0.], color_std=[1.,1.,1.]):
+		loader=utils.scannet_loader, color_mean=[0.,0.,0.], color_std=[1.,1.,1.], load_depth=False):
 		
 		self.root_dir = root_dir
 		self.scene_file = scene_file
@@ -31,6 +35,10 @@ class ScanNet(data.Dataset):
 		self.length = 0
 		self.color_mean = color_mean
 		self.color_std = color_std
+		self.load_depth = load_depth
+
+		if self.load_depth is True:
+			self.loader = utils.scannet_loader_depth
 
 		# Get the list of scenes, and generate paths
 		scene_list = []
@@ -47,28 +55,34 @@ class ScanNet(data.Dataset):
 		if self.mode.lower() == 'train':
 			# Get train data and labels filepaths
 			self.train_data = []
+			self.train_depth = []
 			self.train_labels = []
 			for scene in scene_list:
 				color_images, depth_images, labels = utils.get_filenames_scannet(self.root_dir, scene)
 				self.train_data += color_images
+				self.train_depth += depth_images
 				self.train_labels += labels
 				self.length += len(color_images)
 		elif self.mode.lower() == 'val':
 			# Get val data and labels filepaths
 			self.val_data = []
+			self.val_depth = []
 			self.val_labels = []
 			for scene in scene_list:
 				color_images, depth_images, labels = utils.get_filenames_scannet(self.root_dir, scene)
 				self.val_data += color_images
+				self.val_depth += depth_images
 				self.val_labels += labels
 				self.length += len(color_images)
 		elif self.mode.lower() == 'test':
 			# Get test data and labels filepaths
 			self.test_data = []
+			self.test_depth = []
 			self.test_labels = []
 			for scene in scene_list:
 				color_images, depth_images, labels = utils.get_filenames_scannet(self.root_dir, scene)
 				self.test_data += color_images
+				self.test_depth += depth_images
 				self.test_labels += labels
 				self.length += len(color_images)
 		else:
@@ -86,18 +100,38 @@ class ScanNet(data.Dataset):
 
 		"""
 
-		if self.mode.lower() == 'train':
-			data_path, label_path = self.train_data[index], self.train_labels[index]
-		elif self.mode.lower() == 'val':
-			data_path, label_path = self.val_data[index], self.val_labels[index]
-		elif self.mode.lower() == 'test':
-			data_path, label_path = self.test_data[index], self.test_labels[index]
+		if self.load_depth is True:
+
+			if self.mode.lower() == 'train':
+				data_path, depth_path, label_path = self.train_data[index], self.train_depth[index], \
+													self.train_labels[index]
+			elif self.mode.lower() == 'val':
+				data_path, depth_path, label_path = self.val_data[index], self.val_depth[index], \
+													self.val_labels[index]
+			elif self.mode.lower() == 'test':
+				data_path, depth_path, label_path = self.test_data[index], self.test_depth[index], \
+													self.test_labels[index]
+			else:
+				raise RuntimeError('Unexpected dataset mode. Supported modes are: train, val, test')
+
+			rgbd, label = self.loader(data_path, depth_path, label_path, self.color_mean, self.color_std)
+
+			return rgbd, label
+
 		else:
-			raise RuntimeError('Unexpected dataset mode. Supported modes are: train, val, test')
 
-		img, label = self.loader(data_path, label_path, self.color_mean, self.color_std)
+			if self.mode.lower() == 'train':
+				data_path, label_path = self.train_data[index], self.train_labels[index]
+			elif self.mode.lower() == 'val':
+				data_path, label_path = self.val_data[index], self.val_labels[index]
+			elif self.mode.lower() == 'test':
+				data_path, label_path = self.test_data[index], self.test_labels[index]
+			else:
+				raise RuntimeError('Unexpected dataset mode. Supported modes are: train, val, test')
 
-		return img, label
+			img, label = self.loader(data_path, label_path, self.color_mean, self.color_std)
+
+			return img, label
 
 
 	def __len__(self):

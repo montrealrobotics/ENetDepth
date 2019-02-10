@@ -22,6 +22,13 @@ def get_arguments():
         help=("The model found in \"--checkpoint_dir/--name/\" and filename "
               "\"--name.h5\" is loaded."))
 
+    # Network architecture to use
+    parser.add_argument(
+        '--arch',
+        choices=['rgb', 'rgbd'],
+        default='rgb',
+        help='Select network architecture. Using RGB, or RGB-D.')
+
     # Hyperparameters
     parser.add_argument(
         "--batch-size",

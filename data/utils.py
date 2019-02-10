@@ -121,6 +121,42 @@ def scannet_loader(data_path, label_path, color_mean=[0.,0.,0.], color_std=[1.,1
 	return data, label
 
 
+def scannet_loader_depth(data_path, depth_path, label_path, color_mean=[0.,0.,0.], color_std=[1.,1.,1.]):
+	"""Loads a sample and label image given their path as PIL images.
+
+	Keyword arguments:
+	- data_path (``string``): The filepath to the image.
+	- depth_path (``string``): The filepath to the depth png.
+	- label_path (``string``): The filepath to the ground-truth image.
+	- color_mean (``list``): R, G, B channel-wise mean
+	- color_std (``list``): R, G, B channel-wise stddev
+
+	Returns the image and the label as PIL images.
+
+	"""
+
+	# Load image
+	rgb = np.array(imageio.imread(data_path))
+	# Reshape rgb from H x W x C to C x H x W
+	rgb = np.moveaxis(rgb, 2, 0)
+	# Define normalizing transform
+	normalize = transforms.Normalize(mean=color_mean, std=color_std)
+	# Convert image to float and map range from [0, 255] to [0.0, 1.0]. Then normalize
+	rgb = normalize(torch.Tensor(rgb.astype(np.float32) / 255.0))
+
+	# Load depth
+	depth = torch.Tensor(np.array(imageio.imread(depth_path)).astype(np.float32) / 1000.0)
+	depth = torch.unsqueeze(depth, 0)
+
+	# Concatenate rgb and depth
+	data = torch.cat((rgb, depth), 0)
+
+	# Load label
+	label = np.array(imageio.imread(label_path)).astype(np.uint8)
+
+	return data, label
+
+
 def remap(image, old_values, new_values):
 	assert isinstance(image, Image.Image) or isinstance(
 		image, np.ndarray), "image must be of type PIL.Image or numpy.ndarray"

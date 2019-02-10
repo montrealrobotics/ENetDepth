@@ -10,7 +10,7 @@ import torch.utils.data as data
 import torchvision.transforms as transforms
 
 import transforms as ext_transforms
-from models.enet import ENet
+from models.enet import ENet, ENetDepth
 from train import Train
 from test import Test
 from metric.iou import IoU
@@ -50,17 +50,20 @@ def load_dataset(dataset):
 	# Get selected dataset
 	# Load the training set as tensors
 	train_set = dataset(args.dataset_dir, args.trainFile, mode='train', transform=image_transform, \
-		label_transform=label_transform, color_mean=color_mean, color_std=color_std)
+		label_transform=label_transform, color_mean=color_mean, color_std=color_std, \
+		load_depth=(args.arch=='rgbd'))
 	train_loader = data.DataLoader(train_set, batch_size=args.batch_size, shuffle=True, num_workers=args.workers)
 
 	# Load the validation set as tensors
 	val_set = dataset(args.dataset_dir, args.valFile, mode='val', transform=image_transform, \
-		label_transform=label_transform, color_mean=color_mean, color_std=color_std)
+		label_transform=label_transform, color_mean=color_mean, color_std=color_std, \
+		load_depth=(args.arch=='rgbd'))
 	val_loader = data.DataLoader(val_set, batch_size=args.batch_size, shuffle=False, num_workers=args.workers)
 
 	# Load the test set as tensors
 	test_set = dataset(args.dataset_dir, args.testFile, mode='test', transform=image_transform, \
-		label_transform=label_transform, color_mean=color_mean, color_std=color_std)
+		label_transform=label_transform, color_mean=color_mean, color_std=color_std, \
+		load_depth=(args.arch=='rgbd'))
 	test_loader = data.DataLoader(test_set, batch_size=args.batch_size, shuffle=False, num_workers=args.workers)
 
 	# Get encoding between pixel valus in label images and RGB colors
@@ -133,9 +136,15 @@ def train(train_loader, val_loader, class_weights, class_encoding):
 	num_classes = len(class_encoding)
 
 	# Intialize ENet
-	model = ENet(num_classes).to(device)
-	# Check if the network architecture is correct
-	print(model)
+	if args.arch.lower() == 'rgb':
+		model = ENet(num_classes).to(device)
+	elif args.arch.lower() == 'rgbd':
+		model = ENetDepth(num_classes).to(device)
+	else:
+		# This condition will not occur (argparse will fail if an invalid option is specified)
+		raise RuntimeError('Invalid network architecture specified.')
+	# # Check if the network architecture is correct
+	# print(model)
 
 	# We are going to use the CrossEntropyLoss loss function as it's most
 	# frequentely used in classification problems with multiple classes which
