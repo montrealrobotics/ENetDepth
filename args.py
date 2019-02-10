@@ -152,5 +152,10 @@ def get_arguments():
         type=str,
         default='save',
         help="The directory where models are saved. Default: save")
+    parser.add_argument(
+        '--validate-every'
+        type=int,
+        default=10,
+        help='Number of epochs after which to validate')
 
     return parser.parse_args()
