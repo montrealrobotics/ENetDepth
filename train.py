@@ -58,6 +58,6 @@ class Train:
             self.metric.add(outputs.detach(), labels.detach())
 
             if iteration_loss:
-                print("[Step: %d] Iteration loss: %.4f" % (step, loss.item()))
+                print("[Step: %d/%d] Iteration loss: %.4f" % (step, len(self.data_loader), loss.item()))
 
         return epoch_loss / len(self.data_loader), self.metric.value()

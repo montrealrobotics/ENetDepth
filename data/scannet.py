@@ -109,6 +109,7 @@ class ScanNet(data.Dataset):
 	def get_color_encoding():
 		"""Color palette for nyu40 labels """
 		return OrderedDict([
+			('unlabeled', (0, 0, 0)),
 			('wall', (174, 199, 232)),
 			('floor', (152, 223, 138)),
 			('cabinet', (31, 119, 180)),
@@ -149,5 +150,4 @@ class ScanNet(data.Dataset):
 			('otherstructure', (94, 106, 211)),
 			('otherfurniture', (82, 84, 163)),
 			('otherprop', (100, 85, 144)),
-			('unlabeled', (0, 0, 0)),
 		])
