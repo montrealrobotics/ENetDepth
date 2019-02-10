@@ -105,6 +105,10 @@ def get_arguments():
         help="The class weighing technique to apply to the dataset. "
         "Default: enet")
     parser.add_argument(
+        '--class-weights-file',
+        type=str,
+        help='Path to class weights file. Will skip class weight computation if provided.')
+    parser.add_argument(
         "--with-unlabeled",
         dest='ignore_unlabeled',
         action='store_false',

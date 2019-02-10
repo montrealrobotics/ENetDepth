@@ -60,7 +60,7 @@ class ScanNet(data.Dataset):
 			for scene in scene_list:
 				color_images, depth_images, labels = utils.get_filenames_scannet(self.root_dir, scene)
 				self.val_data += color_images
-				self.val_labels + labels
+				self.val_labels += labels
 				self.length += len(color_images)
 		elif self.mode.lower() == 'test':
 			# Get test data and labels filepaths

@@ -1,5 +1,7 @@
 import os
 
+import numpy as np
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -93,15 +95,24 @@ def load_dataset(dataset):
 
 	# Get class weights from the selected weighing technique
 	print("\nWeighing technique:", args.weighing)
-	print("Computing class weights...")
-	print("(this can take a while depending on the dataset size)")
-	class_weights = 0
-	if args.weighing.lower() == 'enet':
-		class_weights = enet_weighing(train_loader, num_classes)
-	elif args.weighing.lower() == 'mfb':
-		class_weights = median_freq_balancing(train_loader, num_classes)
-	else:
-		class_weights = None
+	# If a class weight file is provided, try loading weights from in there
+	class_weights = None
+	if args.class_weights_file:
+		print('Trying to load class weights from file...')
+		try:
+			class_weights = np.loadtxt(args.class_weights_file)
+		except Exception as e:
+			raise e
+	if class_weights is None:
+		print("Computing class weights...")
+		print("(this can take a while depending on the dataset size)")
+		class_weights = 0
+		if args.weighing.lower() == 'enet':
+			class_weights = enet_weighing(train_loader, num_classes)
+		elif args.weighing.lower() == 'mfb':
+			class_weights = median_freq_balancing(train_loader, num_classes)
+		else:
+			class_weights = None
 
 	if class_weights is not None:
 		class_weights = torch.from_numpy(class_weights).float().to(device)
