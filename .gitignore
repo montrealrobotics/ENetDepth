@@ -114,3 +114,4 @@ venv.bak/
 
 # Ignore cache dir
 cache/
+save/
