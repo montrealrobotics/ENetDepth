@@ -236,7 +236,7 @@ def test(model, test_loader, class_weights, class_encoding):
 
 	print(">>>> Running test dataset")
 
-	loss, (iou, miou) = test.run_epoch(args.print_step)
+	loss, (iou, miou) = test.run_epoch(args.print_step, args.generate_images, args.save_dir)
 	class_iou = dict(zip(class_encoding.keys(), iou))
 
 	print(">>>> Avg. loss: {0:.4f} | Mean IoU: {1:.4f}".format(loss, miou))
@@ -297,25 +297,25 @@ if __name__ == '__main__':
 	train_loader, val_loader, test_loader = loaders
 
 	if args.mode.lower() in {'train', 'full'}:
-	    model = train(train_loader, val_loader, w_class, class_encoding)
-	    if args.mode.lower() == 'full':
-	        test(model, test_loader, w_class, class_encoding)
+		model = train(train_loader, val_loader, w_class, class_encoding)
+		if args.mode.lower() == 'full':
+			test(model, test_loader, w_class, class_encoding)
 	elif args.mode.lower() == 'test':
-	    # Intialize a new ENet model
-	    num_classes = len(class_encoding)
-	    model = ENet(num_classes).to(device)
+		# Intialize a new ENet model
+		num_classes = len(class_encoding)
+		model = ENet(num_classes).to(device)
 
-	    # Initialize a optimizer just so we can retrieve the model from the
-	    # checkpoint
-	    optimizer = optim.Adam(model.parameters())
+		# Initialize a optimizer just so we can retrieve the model from the
+		# checkpoint
+		optimizer = optim.Adam(model.parameters())
 
-	    # Load the previoulsy saved model state to the ENet model
-	    model = utils.load_checkpoint(model, optimizer, args.save_dir,
-	                                  args.name)[0]
-	    print(model)
-	    test(model, test_loader, w_class, class_encoding)
+		# Load the previoulsy saved model state to the ENet model
+		model = utils.load_checkpoint(model, optimizer, args.save_dir,
+									  args.name)[0]
+		print(model)
+		test(model, test_loader, w_class, class_encoding)
 	else:
-	    # Should never happen...but just in case it does
-	    raise RuntimeError(
-	        "\"{0}\" is not a valid choice for execution mode.".format(
-	            args.mode))
+		# Should never happen...but just in case it does
+		raise RuntimeError(
+			"\"{0}\" is not a valid choice for execution mode.".format(
+				args.mode))
