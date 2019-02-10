@@ -154,7 +154,7 @@ def train(train_loader, val_loader, class_weights, class_encoding):
 	# ENet authors used Adam as the optimizer
 	optimizer = optim.Adam(
 		model.parameters(),
-		lr=args.learning_rate,
+		lr=args.learning_rate, betas=(args.beta0, args.beta1)
 		weight_decay=args.weight_decay)
 
 	# Learning rate decay scheduler
