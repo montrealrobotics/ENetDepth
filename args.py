@@ -122,7 +122,7 @@ def get_arguments():
         help="Number of subprocesses to use for data loading. Default: 4")
     parser.add_argument(
         "--print-step",
-        action='store_true',
+        type=int,
         help="Print loss every step")
     parser.add_argument(
         "--imshow-batch",

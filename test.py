@@ -54,7 +54,7 @@ class Test:
             # Keep track of evaluation the metric
             self.metric.add(outputs.detach(), labels.detach())
 
-            if iteration_loss:
+            if iteration_loss > 0 and (step % iteration_loss == 0):
                 print("[Step: %d/%d] Iteration loss: %.4f" % (step, len(self.data_loader), loss.item()))
 
         return epoch_loss / len(self.data_loader), self.metric.value()

@@ -22,7 +22,7 @@ class Train:
         self.metric = metric
         self.device = device
 
-    def run_epoch(self, iteration_loss=False):
+    def run_epoch(self, iteration_loss=0):
         """Runs an epoch of training.
 
         Keyword arguments:
@@ -57,7 +57,7 @@ class Train:
             # Keep track of the evaluation metric
             self.metric.add(outputs.detach(), labels.detach())
 
-            if iteration_loss:
+            if iteration_loss > 0 and (step % iteration_loss == 0):
                 print("[Step: %d/%d] Iteration loss: %.4f" % (step, len(self.data_loader), loss.item()))
 
         return epoch_loss / len(self.data_loader), self.metric.value()
