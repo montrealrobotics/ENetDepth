@@ -121,14 +121,8 @@ def scannet_loader(data_path, label_path, color_mean=[0.,0.,0.], color_std=[1.,1
 		label = np.array(imageio.imread(label_path)).astype(np.uint8)
 	elif seg_classes.lower() == 'scannet20':
 		label = np.array(imageio.imread(label_path)).astype(np.uint8)
-		# Ignore indices 13, 15, 17, 18, 19, 20, 21, 22, 23, 25, 26. 27. 29. 30. 31. 32, 35. 37. 38, 40
-		# Because, these classes from 'nyu40' are absent from 'scannet20'. Our label files are in 
-		# 'nyu40' format, hence this 'hack'. To see detailed class lists visit:
-		# http://kaldir.vc.in.tum.de/scannet_benchmark/labelids_all.txt ('nyu40' labels)
-		# http://kaldir.vc.in.tum.de/scannet_benchmark/labelids.txt ('scannet20' labels)
-		indices_to_ignore = [13, 15, 17, 18, 19, 20, 21, 22, 23, 25, 26, 27, 29, 30, 31, 32, 35, 37, 38, 40]
-		for idx in indices_to_ignore:
-			label[np.where(label == idx)] = 0
+		# Remap classes from 'nyu40' to 'scannet20'
+		label = nyu40_to_scannet20(label)
 
 	return data, label
 
@@ -170,16 +164,30 @@ def scannet_loader_depth(data_path, depth_path, label_path, color_mean=[0.,0.,0.
 		label = np.array(imageio.imread(label_path)).astype(np.uint8)
 	elif seg_classes.lower() == 'scannet20':
 		label = np.array(imageio.imread(label_path)).astype(np.uint8)
-		# Ignore indices 13, 15, 17, 18, 19, 20, 21, 22, 23, 25, 26. 27. 29. 30. 31. 32, 35. 37. 38, 40
-		# Because, these classes from 'nyu40' are absent from 'scannet20'. Our label files are in 
-		# 'nyu40' format, hence this 'hack'. To see detailed class lists visit:
-		# http://kaldir.vc.in.tum.de/scannet_benchmark/labelids_all.txt ('nyu40' labels)
-		# http://kaldir.vc.in.tum.de/scannet_benchmark/labelids.txt ('scannet20' labels)
-		indices_to_ignore = [13, 15, 17, 18, 19, 20, 21, 22, 23, 25, 26, 27, 29, 30, 31, 32, 35, 37, 38, 40]
-		for idx in indices_to_ignore:
-			label[np.where(label == idx)] = 0
+		# Remap classes from 'nyu40' to 'scannet20'
+		label = nyu40_to_scannet20(label)
 
 	return data, label
+
+
+def nyu40_to_scannet20(label):
+	"""Remap a label image from the 'nyu40' class palette to the 'scannet20' class palette """
+
+	# Ignore indices 13, 15, 17, 18, 19, 20, 21, 22, 23, 25, 26. 27. 29. 30. 31. 32, 35. 37. 38, 40
+	# Because, these classes from 'nyu40' are absent from 'scannet20'. Our label files are in 
+	# 'nyu40' format, hence this 'hack'. To see detailed class lists visit:
+	# http://kaldir.vc.in.tum.de/scannet_benchmark/labelids_all.txt ('nyu40' labels)
+	# http://kaldir.vc.in.tum.de/scannet_benchmark/labelids.txt ('scannet20' labels)
+	# The remaining labels are then to be mapped onto a contiguous ordering in the range [0,20]
+
+	# The remapping array comprises tuples (src, tar), where 'src' is the 'nyu40' label, and 'tar' is the 
+	# corresponding target 'scannet20' label
+	remapping = [(0,0),(13,0),(15,0),(17,0),(18,0),(19,0),(20,0),(21,0),(22,0),(23,0),(25,0),(26,0),(27,0),
+				(29,0),(30,0),(31,0),(32,0),(35,0),(37,0),(38,0),(40,0),(14,13),(16,14),(24,15),(28,16),(33,17),
+				(34,18),(36,19),(39,20)]
+	for src, tar in remapping:
+		label[np.where(label==src)] = tar
+	return label
 
 
 def remap(image, old_values, new_values):
