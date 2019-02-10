@@ -134,7 +134,7 @@ class ScanNet(data.Dataset):
 			else:
 				raise RuntimeError('Unexpected dataset mode. Supported modes are: train, val, test')
 
-			img, label = self.loader(data_path, label_path, self.color_mean, self.color_std)
+			img, label = self.loader(data_path, label_path, self.color_mean, self.color_std, self.seg_classes)
 
 			return img, label
 
