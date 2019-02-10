@@ -29,6 +29,13 @@ def get_arguments():
         default='rgb',
         help='Select network architecture. Using RGB, or RGB-D.')
 
+    # Segmentation class variants to use
+    parser.add_argument(
+        '--seg-classes',
+        choices=['nyu40', 'scannet20'],
+        default='nyu40',
+        help='Choose the palette of classes learnt by the network.')
+
     # Hyperparameters
     parser.add_argument(
         "--batch-size",

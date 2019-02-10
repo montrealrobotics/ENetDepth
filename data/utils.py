@@ -93,14 +93,15 @@ def get_files(folder, name_filter=None, extension_filter=None):
 	return filtered_files
 
 
-def scannet_loader(data_path, label_path, color_mean=[0.,0.,0.], color_std=[1.,1.,1.]):
-	"""Loads a sample and label image given their path as PIL images.
+def scannet_loader(data_path, label_path, color_mean=[0.,0.,0.], color_std=[1.,1.,1.], seg_classes='nyu40'):
+	"""Loads a sample and label image given their path as PIL images. (nyu40 classes)
 
 	Keyword arguments:
 	- data_path (``string``): The filepath to the image.
 	- label_path (``string``): The filepath to the ground-truth image.
 	- color_mean (``list``): R, G, B channel-wise mean
 	- color_std (``list``): R, G, B channel-wise stddev
+	- seg_classes (``string``): Palette of classes to load labels for ('nyu40' or 'scannet20')
 
 	Returns the image and the label as PIL images.
 
@@ -116,13 +117,25 @@ def scannet_loader(data_path, label_path, color_mean=[0.,0.,0.], color_std=[1.,1
 	data = normalize(torch.Tensor(data.astype(np.float32) / 255.0))
 
 	# Load label
-	label = np.array(imageio.imread(label_path)).astype(np.uint8)
+	if seg_classes.lower() == 'nyu40':
+		label = np.array(imageio.imread(label_path)).astype(np.uint8)
+	elif seg_classes.lower() == 'scannet20':
+		label = np.array(imageio.imread(label_path)).astype(np.uint8)
+		# Ignore indices 13, 15, 17, 18, 19, 20, 21, 22, 23, 25, 26. 27. 29. 30. 31. 32, 35. 37. 38, 40
+		# Because, these classes from 'nyu40' are absent from 'scannet20'. Our label files are in 
+		# 'nyu40' format, hence this 'hack'. To see detailed class lists visit:
+		# http://kaldir.vc.in.tum.de/scannet_benchmark/labelids_all.txt ('nyu40' labels)
+		# http://kaldir.vc.in.tum.de/scannet_benchmark/labelids.txt ('scannet20' labels)
+		indices_to_ignore = [13, 15, 17, 18, 19, 20, 21, 22, 23, 25, 26, 27, 29, 30, 31, 32, 35, 37, 38, 40]
+		for idx in indices_to_ignore:
+			label[np.where(label == idx)] = 0
 
 	return data, label
 
 
-def scannet_loader_depth(data_path, depth_path, label_path, color_mean=[0.,0.,0.], color_std=[1.,1.,1.]):
-	"""Loads a sample and label image given their path as PIL images.
+def scannet_loader_depth(data_path, depth_path, label_path, color_mean=[0.,0.,0.], color_std=[1.,1.,1.], \
+	seg_classes='nyu40'):
+	"""Loads a sample and label image given their path as PIL images. (nyu40 classes)
 
 	Keyword arguments:
 	- data_path (``string``): The filepath to the image.
@@ -130,6 +143,7 @@ def scannet_loader_depth(data_path, depth_path, label_path, color_mean=[0.,0.,0.
 	- label_path (``string``): The filepath to the ground-truth image.
 	- color_mean (``list``): R, G, B channel-wise mean
 	- color_std (``list``): R, G, B channel-wise stddev
+	- seg_classes (``string``): Palette of classes to load labels for ('nyu40' or 'scannet20')
 
 	Returns the image and the label as PIL images.
 
@@ -152,7 +166,18 @@ def scannet_loader_depth(data_path, depth_path, label_path, color_mean=[0.,0.,0.
 	data = torch.cat((rgb, depth), 0)
 
 	# Load label
-	label = np.array(imageio.imread(label_path)).astype(np.uint8)
+	if seg_classes.lower() == 'nyu40':
+		label = np.array(imageio.imread(label_path)).astype(np.uint8)
+	elif seg_classes.lower() == 'scannet20':
+		label = np.array(imageio.imread(label_path)).astype(np.uint8)
+		# Ignore indices 13, 15, 17, 18, 19, 20, 21, 22, 23, 25, 26. 27. 29. 30. 31. 32, 35. 37. 38, 40
+		# Because, these classes from 'nyu40' are absent from 'scannet20'. Our label files are in 
+		# 'nyu40' format, hence this 'hack'. To see detailed class lists visit:
+		# http://kaldir.vc.in.tum.de/scannet_benchmark/labelids_all.txt ('nyu40' labels)
+		# http://kaldir.vc.in.tum.de/scannet_benchmark/labelids.txt ('scannet20' labels)
+		indices_to_ignore = [13, 15, 17, 18, 19, 20, 21, 22, 23, 25, 26, 27, 29, 30, 31, 32, 35, 37, 38, 40]
+		for idx in indices_to_ignore:
+			label[np.where(label == idx)] = 0
 
 	return data, label
 
