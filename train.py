@@ -38,7 +38,7 @@ class Train:
         for step, batch_data in enumerate(self.data_loader):
             # Get the inputs and labels
             inputs = batch_data[0].to(self.device)
-            labels = batch_data[1].to(self.device)
+            labels = batch_data[1].long().to(self.device)
 
             # Forward propagation
             outputs = self.model(inputs)

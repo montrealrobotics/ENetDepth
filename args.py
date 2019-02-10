@@ -67,19 +67,37 @@ def get_arguments():
     parser.add_argument(
         "--dataset-dir",
         type=str,
-        default="data/ScanNet",
+        default="data/ENet",
         help="Path to the root directory of the selected dataset. "
-        "Default: data/ScanNet")
+        "Default: data/ENet")
+    parser.add_argument(
+        "--trainFile",
+        type=str,
+        default="data/ENet/train.txt",
+        help="Path to txt file containing a list of training scenes."
+        "Default: data/ENet/train.txt")
+    parser.add_argument(
+        "--valFile",
+        type=str,
+        default="data/ENet/val.txt",
+        help="Path to txt file containing a list of validation scenes."
+        "Default: data/ENet/val.txt")
+    parser.add_argument(
+        "--testFile",
+        type=str,
+        default="data/ENet/test.txt",
+        help="Path to txt file containing a list of testing scenes."
+        "Default: data/ENet/test.txt")
     parser.add_argument(
         "--height",
         type=int,
-        default=360,
-        help="The image height. Default: 360")
+        default=240,
+        help="The image height. Default: 240")
     parser.add_argument(
         "--width",
         type=int,
-        default=480,
-        help="The image width. Default: 480")
+        default=320,
+        help="The image width. Default: 320")
     parser.add_argument(
         "--weighing",
         choices=['enet', 'mfb', 'none'],

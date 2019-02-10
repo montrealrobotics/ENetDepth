@@ -111,3 +111,6 @@ venv.bak/
 # VSCode
 .vscode/
 *.code-workspace
+
+# Ignore cache dir
+cache/
