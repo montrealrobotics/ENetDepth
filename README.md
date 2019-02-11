@@ -5,7 +5,7 @@ PyTorch (v1.0.0) re-implementation of [*ENet: A Deep Neural Network Architecture
 This implementation has been tailored to suit the [ScanNet](http://www.scan-net.org) dataset.
 
 <p align="center">
-	<img src="images/scannet_demo.png>"
+	<img src="images/scannet_demo.png">
 </p>
 
 ## What's new from ENet?
