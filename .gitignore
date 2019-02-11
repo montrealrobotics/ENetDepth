@@ -120,8 +120,8 @@ prepare_data/extract_sens.py
 # Unignore a few relevant files
 !cache/class_weights_nyu40.txt
 !cache/class_weights_scannet20.txt
-!sceneList.txt
-!test.txt
-!train.txt
+!cache/sceneList.txt
+!cache/test.txt
+!cache/train.txt
 !save/ENetDepth-scannet20
 !save/ENetDepth-scannet20_summary.txt

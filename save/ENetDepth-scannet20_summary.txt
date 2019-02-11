@@ -1,0 +1,34 @@
+ARGUMENTS
+arch: rgbd
+batch_size: 64
+beta0: 0.7
+beta1: 0.999
+class_weights_file: cache/class_weights_scannet20.txt
+dataset: scannet
+dataset_dir: /path/to/scannet/scannetv2_images/
+device: cuda
+epochs: 100
+height: 240
+ignore_unlabeled: True
+imshow_batch: False
+learning_rate: 0.001
+lr_decay: 0.1
+lr_decay_epochs: 60
+mode: train
+name: ENetDepth-scannet20
+print_step: 25
+resume: True
+save_dir: save
+seg_classes: scannet20
+testFile: cache/test.txt
+trainFile: cache/train.txt
+valFile: cache/test.txt
+validate_every: 10
+weighing: ENet
+weight_decay: 0.0002
+width: 320
+workers: 4
+
+BEST VALIDATION
+Epoch: 100
+Mean IoU: 0.37126799155821655
