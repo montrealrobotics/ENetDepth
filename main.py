@@ -236,7 +236,7 @@ def test(model, test_loader, class_weights, class_encoding):
 
 	print(">>>> Running test dataset")
 
-	loss, (iou, miou) = test.run_epoch(args.print_step, args.generate_images, args.save_dir)
+	loss, (iou, miou) = test.run_epoch(args.print_step)
 	class_iou = dict(zip(class_encoding.keys(), iou))
 
 	print(">>>> Avg. loss: {0:.4f} | Mean IoU: {1:.4f}".format(loss, miou))
@@ -303,7 +303,13 @@ if __name__ == '__main__':
 	elif args.mode.lower() == 'test':
 		# Intialize a new ENet model
 		num_classes = len(class_encoding)
-		model = ENet(num_classes).to(device)
+		if args.arch.lower() == 'rgb':
+			model = ENet(num_classes).to(device)
+		elif args.arch.lower() == 'rgbd':
+			model = ENetDepth(num_classes).to(device)
+		else:
+			# This condition will not occur (argparse will fail if an invalid option is specified)
+			raise RuntimeError('Invalid network architecture specified.')
 
 		# Initialize a optimizer just so we can retrieve the model from the
 		# checkpoint

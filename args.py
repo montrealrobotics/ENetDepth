@@ -11,9 +11,10 @@ def get_arguments():
 	parser.add_argument(
 		"--mode",
 		"-m",
-		choices=['train', 'test', 'full'],
+		choices=['train', 'test', 'inference', 'full'],
 		default='train',
-		help=("train: performs training and validation; test: tests the model "
+		help=("train: performs training and validation; test: tests the model; "
+			  "inference: similar to test, but has advanced functionality, eg. saving results, etc."
 			  "found in \"--save_dir\" with name \"--name\" on \"--dataset\"; "
 			  "full: combines train and test modes. Default: train"))
 	parser.add_argument(
@@ -21,6 +22,11 @@ def get_arguments():
 		action='store_true',
 		help=("The model found in \"--checkpoint_dir/--name/\" and filename "
 			  "\"--name.h5\" is loaded."))
+	parser.add_argument(
+		'--generate-images',
+		action='store_true',
+		help="Used in inference mode. Generates segmentation images, for visualization."
+		)
 
 	# Network architecture to use
 	parser.add_argument(

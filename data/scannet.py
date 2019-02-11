@@ -78,7 +78,7 @@ class ScanNet(data.Dataset):
 				self.val_depth += depth_images
 				self.val_labels += labels
 				self.length += len(color_images)
-		elif self.mode.lower() == 'test':
+		elif self.mode.lower() == 'test' or self.mode.lower() == 'inference':
 			# Get test data and labels filepaths
 			self.test_data = []
 			self.test_depth = []
@@ -90,7 +90,7 @@ class ScanNet(data.Dataset):
 				self.test_labels += labels
 				self.length += len(color_images)
 		else:
-			raise RuntimeError('Unexpected dataset mode. Supported modes are: train, val, test')
+			raise RuntimeError('Unexpected dataset mode. Supported modes are: train, val, test, inference')
 
 
 	def __getitem__(self, index):
@@ -112,16 +112,19 @@ class ScanNet(data.Dataset):
 			elif self.mode.lower() == 'val':
 				data_path, depth_path, label_path = self.val_data[index], self.val_depth[index], \
 													self.val_labels[index]
-			elif self.mode.lower() == 'test':
+			elif self.mode.lower() == 'test' or self.mode.lower() == 'inference':
 				data_path, depth_path, label_path = self.test_data[index], self.test_depth[index], \
 													self.test_labels[index]
 			else:
-				raise RuntimeError('Unexpected dataset mode. Supported modes are: train, val, test')
+				raise RuntimeError('Unexpected dataset mode. Supported modes are: train, val, test, inference')
 
 			rgbd, label = self.loader(data_path, depth_path, label_path, self.color_mean, self.color_std, \
 				self.seg_classes)
 
-			return rgbd, label
+			if self.mode.lower() == 'inference':
+				return rgbd, label, data_path, depth_path, label_path
+			else:
+				return rgbd, label
 
 		else:
 
@@ -129,14 +132,17 @@ class ScanNet(data.Dataset):
 				data_path, label_path = self.train_data[index], self.train_labels[index]
 			elif self.mode.lower() == 'val':
 				data_path, label_path = self.val_data[index], self.val_labels[index]
-			elif self.mode.lower() == 'test':
+			elif self.mode.lower() == 'test' or self.mode.lower() == 'inference':
 				data_path, label_path = self.test_data[index], self.test_labels[index]
 			else:
 				raise RuntimeError('Unexpected dataset mode. Supported modes are: train, val, test')
 
 			img, label = self.loader(data_path, label_path, self.color_mean, self.color_std, self.seg_classes)
 
-			return img, label
+			if self.mode.lower() == 'inference':
+				return img, label, data_path, label_path
+			else:
+				return img, label
 
 
 	def __len__(self):

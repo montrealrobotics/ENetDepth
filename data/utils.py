@@ -190,6 +190,21 @@ def nyu40_to_scannet20(label):
 	return label
 
 
+def create_label_image(output, color_palette):
+	"""Create a label image, given a network output (each pixel contains class index) and a color palette.
+
+	Args:
+	- output (``np.array``, dtype = np.uint8): Output image. Height x Width. Each pixel contains an integer, 
+	corresponding to the class label of that pixel.
+	- color_palette (``OrderedDict``): Contains (R, G, B) colors (uint8) for each class.
+	"""
+	
+	label_image = np.zeros((output.shape[0], output.shape[1], 3), dtype=np.uint8)
+	for idx, color in enumerate(color_palette):
+		label_image[output==idx] = color
+	return label_image
+
+
 def remap(image, old_values, new_values):
 	assert isinstance(image, Image.Image) or isinstance(
 		image, np.ndarray), "image must be of type PIL.Image or numpy.ndarray"
